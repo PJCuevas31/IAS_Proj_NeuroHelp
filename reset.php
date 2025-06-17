@@ -1,24 +1,27 @@
 <?php
 require 'db.php';
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $token = $_POST['token'];
-    $newpass = password_hash($_POST['password'], PASSWORD_DEFAULT);
-
-    $stmt = $conn->prepare("UPDATE users SET password=?, token=NULL WHERE token=?");
-    $stmt->execute([$newpass, $token]);
-
-    echo "Password has been updated.<br>";
-    echo "<a href='login.html'>Return to Login</a>";
-
+if (!isset($_GET['token'])) {
+    echo "No token provided.";
     exit;
 }
-
-$token = $_GET['token'] ?? '';
+$token = $_GET['token'];
 ?>
 
-<form method="POST">
-    <input type="hidden" name="token" value="<?= htmlspecialchars($token) ?>">
-    <input type="password" name="password" placeholder="New Password" required>
+<!DOCTYPE html>
+<html>
+<head><title>Reset Password</title></head>
+<body>
+<h2>Reset Your Password</h2>
+<form method="POST" action="process_reset.php">
+    <input type="hidden" name="token" value="<?php echo htmlspecialchars($token); ?>">
+    <label>Enter OTP:</label><br>
+    <input type="text" name="otp" required><br><br>
+
+    <label>New Password:</label><br>
+    <input type="password" name="new_password" required><br><br>
+
     <button type="submit">Reset Password</button>
 </form>
+</body>
+</html>
